@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -lc 'S=\"$HOME/.grok/hard-allow/session.json\"; E=\"$HOME/.grok/hard-allow/active.env\"; if [ -f \"$S\" ]; then node \"$HOME/.grok/hard-allow/ceremony.mjs\" --check >/dev/null 2>&1 && echo \"[HARD ALLOW] session active (token armed)\" || echo \"[HARD ALLOW] session file expired — run grok --hard-allow\"; fi; if [ -n \"${SECOPS_HARD_ALLOW_TOKEN:-}\" ] || [ \"${GROK_HARD_ALLOW_ACTIVE:-}\" = \"1\" ]; then echo \"[HARD ALLOW] env armed GROK_HARD_ALLOW_ACTIVE=${GROK_HARD_ALLOW_ACTIVE:-0}\"; fi'",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

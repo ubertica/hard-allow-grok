@@ -1,0 +1,17 @@
+# Secrets / live session (never commit)
+**/.env
+**/active.env
+**/session.json
+**/ARMED
+**/audit.jsonl
+**/*-tokens*
+**/*.pre-hard-allow.bak
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Node
+node_modules/
