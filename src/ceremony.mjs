@@ -282,7 +282,13 @@ if (args.includes('--reuse-if-active')) {
     writeSession(s); // refresh active.env
     process.env.SECOPS_HARD_ALLOW_TOKEN = s.hardAllowToken;
     process.env.GROK_HARD_ALLOW_ACTIVE = '1';
-    console.error(`HARD ALLOW ya activo hasta ${s.expiresAt} (reuse).`);
+    // Re-stamp rules (incl. infection-delivery nuclear grant) without new ceremony
+    try {
+      spawnSync(process.execPath, [join(__dirname, 'arm.mjs')], { stdio: 'inherit' });
+    } catch {
+      /* ignore */
+    }
+    console.error(`HARD ALLOW ya activo hasta ${s.expiresAt} (reuse + re-arm).`);
     process.exit(0);
   }
 }

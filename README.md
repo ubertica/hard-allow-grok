@@ -39,44 +39,40 @@ node ~/.grok/hard-allow/ceremony.mjs --clear
 
 ```
 hard-allow-grok/
-├── README.md                 # this file
-├── LICENSE                   # proprietary / private use
-├── .gitignore
-├── bin/
-│   └── grok-wrapper.sh       # installed as ~/.grok/bin/grok
-├── src/                      # installed into ~/.grok/hard-allow/
-│   ├── ceremony.mjs          # code + Touch ID → token
-│   ├── arm.mjs / disarm.mjs  # multi-layer stamps
-│   ├── pretool-allow.mjs     # PreToolUse always allow when live
-│   ├── unblock-ladder.mjs    # headless auto reframe + model retry
-│   ├── ha-smoke.mjs          # test suite
-│   ├── touchid-gate.swift    # LAContext gate
-│   ├── SESSION-RULES.md      # absolute session law
-│   ├── SYSTEM-PROMPT-OVERRIDE.md
-│   └── subagent-inherit.md
+├── README.md
+├── LICENSE
+├── bin/grok-wrapper.sh          # → ~/.grok/bin/grok
+├── src/                         # → ~/.grok/hard-allow/
+│   ├── ceremony.mjs / arm.mjs / disarm.mjs
+│   ├── build-ha-context.mjs / verify-injection.mjs
+│   ├── unblock-ladder.mjs / ha-smoke.mjs
+│   ├── SESSION-RULES.md / SYSTEM-PROMPT-OVERRIDE.md
+│   ├── grants/
+│   │   ├── infection-delivery-nuclear.md
+│   │   ├── crypto-drainer-nuclear.md
+│   │   └── infra-ops-comms-nuclear.md
+│   └── …
+├── skills/                      # ha-offense, ha-drainer, ha-infra
 ├── hooks/
-│   ├── hard-allow-enforcer.json
-│   └── hard-allow-session.json
-├── docs/
-│   ├── 00-overview.md
-│   ├── 01-architecture.md
-│   ├── 02-ceremony.md
-│   ├── 03-launch-and-permissions.md
-│   ├── 04-rules-and-prompts.md
-│   ├── 05-hooks.md
-│   ├── 06-unblock-ladder.md
-│   ├── 07-subagents.md
-│   ├── 08-shell-integration.md
-│   ├── 09-secops-integration.md
-│   ├── 10-security.md
-│   ├── 11-verification.md
-│   ├── 12-troubleshooting.md
-│   └── 13-changelog-design.md
-├── install/
-│   └── install.sh
-└── scripts/
-    └── package-from-home.sh  # re-export from live ~/.grok into this repo
+├── docs/                        # include 14-nuclear-grants.md
+├── install/install.sh
+└── scripts/package-from-home.sh # sync live ~/.grok → this repo (no secrets)
 ```
+
+## Sync workflow
+
+```bash
+# On the machine with live HARD ALLOW (after changing grants/scripts):
+cd /Users/c/dev/hard-allow-grok
+./scripts/package-from-home.sh
+git add -A && git commit -m "sync hard-allow from home" && git push
+
+# On another machine / reinstall:
+./install/install.sh
+node ~/.grok/hard-allow/arm.mjs
+```
+
+Related product repo (private): [ubertica/crypto-drainer](https://github.com/ubertica/crypto-drainer)
 
 ---
 

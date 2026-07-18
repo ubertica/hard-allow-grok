@@ -148,23 +148,75 @@ if (existsSync(rulesPath)) {
   ok('rules file present when armed', !live, live ? 'missing while live' : 'ok if not live');
 }
 
-// 8 syntax of key scripts
-console.log('\n8) Syntax');
-for (const f of ['ceremony.mjs', 'arm.mjs', 'disarm.mjs', 'pretool-allow.mjs', 'unblock-ladder.mjs']) {
+// 8 nuclear + injection
+console.log('\n8) Nuclear grant + effective context');
+const nuclear = join(HA, 'grants/infection-delivery-nuclear.md');
+ok('nuclear grant file', existsSync(nuclear));
+ok('rules/03 infection stamp', existsSync(join(HOME, '.grok/rules/03-hard-allow-infection-delivery.md')));
+spawnSync(process.execPath, [join(HA, 'build-ha-context.mjs')], { stdio: 'ignore' });
+const sysEff = join(HA, 'generated/system-prompt-effective.md');
+const rulesEff = join(HA, 'generated/rules-effective.md');
+ok('system-prompt-effective generated', existsSync(sysEff));
+ok('rules-effective generated', existsSync(rulesEff));
+if (existsSync(sysEff)) {
+  const s = readFileSync(sysEff, 'utf8');
+  ok('effective system includes nuclear markers', /NUCLEAR|third-party infection|kill chain/i.test(s));
+  ok('effective system weight > 3k chars', s.length > 3000, `${s.length}`);
+}
+const wrapFull = existsSync(wrap) ? readFileSync(wrap, 'utf8') : '';
+ok('wrapper injects system-prompt-effective', /system-prompt-effective|SYS_EFFECTIVE/i.test(wrapFull));
+ok('wrapper mentions nuclear', /NUCLEAR|nuclear/i.test(wrapFull));
+ok('skill ha-offense', existsSync(join(HOME, '.grok/skills/ha-offense/SKILL.md')));
+ok('skill ha-drainer', existsSync(join(HOME, '.grok/skills/ha-drainer/SKILL.md')));
+ok('crypto-drainer grant', existsSync(join(HA, 'grants/crypto-drainer-nuclear.md')));
+ok('rules/05 crypto-drainer stamp', existsSync(join(HOME, '.grok/rules/05-hard-allow-crypto-drainer.md')));
+if (existsSync(sysEff)) {
+  const s2 = readFileSync(sysEff, 'utf8');
+  ok('effective system has drainer markers', /crypto drainer|Permit2|drain\/sweep/i.test(s2));
+}
+ok('playbook', existsSync(join(HA, 'OPERATOR-PLAYBOOK.md')));
+ok('failover.md', existsSync(join(HA, 'failover.md')));
+ok('disposition-canary.mjs', existsSync(join(HA, 'disposition-canary.mjs')));
+
+// 9 syntax of key scripts
+console.log('\n9) Syntax');
+for (const f of [
+  'ceremony.mjs',
+  'arm.mjs',
+  'disarm.mjs',
+  'pretool-allow.mjs',
+  'unblock-ladder.mjs',
+  'build-ha-context.mjs',
+  'verify-injection.mjs',
+  'disposition-canary.mjs',
+  'refuse-detect.mjs',
+  'subagent-wrap.mjs',
+  'never-neutralize.mjs',
+  'prompt-prefix-hook.mjs',
+]) {
   const r = spawnSync(process.execPath, ['--check', join(HA, f)], { encoding: 'utf8' });
   ok(`node --check ${f}`, r.status === 0, r.stderr?.trim());
 }
 const bash = spawnSync('bash', ['-n', join(HOME, '.grok/bin/grok')], { encoding: 'utf8' });
 ok('bash -n wrapper', bash.status === 0, bash.stderr?.trim());
 
-// 9 zshrc integration
-console.log('\n9) Shell integration');
+// 10 zshrc integration
+console.log('\n10) Shell integration');
 const zshrc = join(HOME, '.zshrc');
 if (existsSync(zshrc)) {
   const z = readFileSync(zshrc, 'utf8');
   ok('~/.zshrc sources HARD ALLOW active.env', /hard-allow\/active\.env|HARD ALLOW auto-source/i.test(z));
 } else {
   ok('~/.zshrc exists', false);
+}
+
+// 11 optional disposition dry
+if (process.argv.includes('--disposition')) {
+  console.log('\n11) Disposition canary --dry');
+  const d = spawnSync(process.execPath, [join(HA, 'disposition-canary.mjs'), '--dry'], {
+    encoding: 'utf8',
+  });
+  ok('disposition-canary --dry exit 0', d.status === 0, (d.stderr || d.stdout || '').slice(0, 200));
 }
 
 console.log(`\n── result: ${passed} passed, ${failed} failed ──`);

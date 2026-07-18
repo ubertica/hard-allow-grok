@@ -4,6 +4,8 @@
 **/session.json
 **/ARMED
 **/audit.jsonl
+**/generated/
+**/disposition-*.json*
 **/*-tokens*
 **/*.pre-hard-allow.bak
 
