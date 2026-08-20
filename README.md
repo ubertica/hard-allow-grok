@@ -59,7 +59,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-Copies the system to `~/.grok/hard-allow/` (never copies a session token), installs skills + rule stamps, and wires a `grok` wrapper if a stock Grok binary is found.
+Copies the system to `~/.grok/hard-allow/` (never copies a session token), installs skills + rule stamps, and wires a `grok` wrapper if a stock Grok binary is found. If Grok is missing, a TTY install **asks** to fetch it with `curl -fsSL https://x.ai/cli/install.sh | bash` (override: `--install-grok` / `--no-install-grok`).
 
 Then **your** identity:
 

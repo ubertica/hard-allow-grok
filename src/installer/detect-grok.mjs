@@ -127,7 +127,7 @@ function resolveMaybeLink(p) {
 }
 
 /**
- * @param {{ home?: string }} opts
+ * @param {{ home?: string, preferNewest?: boolean }} opts
  * @returns {{ found: boolean, realBin: string|null, wrapperOnPath: string|null, downloads: string[], notes: string[] }}
  */
 export function detectGrok(opts = {}) {
@@ -191,6 +191,11 @@ export function detectGrok(opts = {}) {
   if (!realBin && downloads[0]) {
     realBin = downloads[0];
     notes.push(`newest download: ${realBin}`);
+  }
+
+  if (opts.preferNewest && downloads[0] && downloads[0] !== realBin) {
+    notes.push(`prefer newest download over ${realBin}: ${downloads[0]}`);
+    realBin = downloads[0];
   }
 
   return {

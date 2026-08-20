@@ -48,9 +48,20 @@ grok --hard-allow
 grok --hard-allow
 ```
 
-If Grok is not installed, HA still installs; ceremony works via `node`. Later:
+If Grok is **not** installed and you are on a TTY, the installer **asks** whether to run the official xAI CLI:
 
 ```bash
+curl -fsSL https://x.ai/cli/install.sh | bash
+```
+
+Default is yes. After that script finishes, HA re-detects the binary (any OS/arch), writes `grok-paths.env`, and **replaces** `~/.grok/bin/grok` with the HA wrapper (`grok-real` keeps the stock binary).
+
+```bash
+# non-interactive
+./install.sh --install-grok --skip-init
+./install.sh --no-install-grok --skip-init
+
+# already have HA, only wrap Grok
 node ~/.grok/hard-allow/installer/install.mjs --wire-grok
 ```
 

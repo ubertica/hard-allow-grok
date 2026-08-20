@@ -13,9 +13,13 @@ cd hard-allow-grok
 Flags:
 
 ```bash
-./install.sh --skip-init     # copy files only; you run --init later
-./install.sh --dry-run       # print paths, copy nothing
+./install.sh --skip-init          # copy files only; you run --init later
+./install.sh --dry-run            # print paths, copy nothing
+./install.sh --install-grok       # if Grok missing, run official xAI CLI (no prompt)
+./install.sh --no-install-grok    # never fetch Grok
 ```
+
+Missing Grok on a TTY: the installer asks, default yes, then runs `curl -fsSL https://x.ai/cli/install.sh | bash` and wraps the binary.
 
 Install target: `~/.grok/hard-allow/`  
 Skills: `~/.grok/skills/` (and `~/.claude/skills/` if that tree exists)  

@@ -11,7 +11,12 @@ export PATH="$HOME/.grok/bin:$HOME/.local/bin:$PATH"
 grok --hard-allow
 ```
 
-Need `rsync` **or** `tar`. Node 18+.
+Need `rsync` **or** `tar`. Node 18+. Missing Grok CLI: the installer asks, or:
+
+```bash
+curl -fsSL https://x.ai/cli/install.sh | bash
+node ~/.grok/hard-allow/installer/install.mjs --wire-grok
+```
 
 ## Windows
 
@@ -22,7 +27,7 @@ node $env:USERPROFILE\.grok\hard-allow\ceremony.mjs --init
 node $env:USERPROFILE\.grok\hard-allow\ceremony.mjs
 ```
 
-Add `%USERPROFILE%\.grok\bin` to PATH. Wrapper: `grok.cmd`.
+Add `%USERPROFILE%\.grok\bin` to PATH. Wrapper: `grok.cmd`. Official CLI: Git Bash / MSYS2 `curl -fsSL https://x.ai/cli/install.sh | bash`, then `node installer\install.mjs --wire-grok`.
 
 ```powershell
 grok --hard-allow

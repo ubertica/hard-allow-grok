@@ -3,7 +3,10 @@
 ```bash
 git clone https://github.com/ubertica/hard-allow-grok.git
 cd hard-allow-grok
+# If Grok is missing, the installer asks to run:
+#   curl -fsSL https://x.ai/cli/install.sh | bash
 ./install.sh --skip-init
+# non-interactive:  ./install.sh --install-grok --skip-init
 
 node ~/.grok/hard-allow/ceremony.mjs --init
 # code:  (you type a new code, twice)
