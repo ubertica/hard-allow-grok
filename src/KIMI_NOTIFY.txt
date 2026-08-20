@@ -1,0 +1,40 @@
+✅ CONTEXT PULL TOOL READY
+
+Context node pull tool successfully built and tested.
+
+📊 Status:
+  Nodes: 43
+  Edges: 62
+  Formats: json, jsonl, markdown, prompt
+  Secrets: Redacted (***REDACTED***)
+
+🛠️ Built Components:
+  ✓ ~/.grok/hard-allow/bin/ha-context-pull.mjs (CLI tool, 250 lines)
+  ✓ /Users/c/dev/multi-llm-ha-chat/src/kernel/context-store.mjs (exportContext() method)
+  ✓ ~/.grok/hard-allow/mcp/context-node-pull.json (MCP tool descriptor)
+  ✓ /Users/c/dev/hard-allow-grok/visualizer/server.mjs (HTTP endpoints: /context/all, /context/query)
+  ✓ ~/.grok/hard-allow/docs/CONTEXT_PULL_TOOL.md (Complete documentation)
+
+🧪 Test Results:
+  ✓ json export: 648 lines
+  ✓ jsonl export: 43 lines
+  ✓ markdown export: 826 lines
+  ✓ prompt format: 18 lines (system prompt)
+  ✓ Query filter: "ha" returned 27 nodes
+  ✓ Secret redaction: Verified
+
+📡 Access Methods:
+  1. CLI: node ~/.grok/hard-allow/bin/ha-context-pull.mjs [--query X] [--format Y] [--for agent]
+  2. MCP: context_node_pull({ query?, format?, forAgent? })
+  3. HTTP: POST http://localhost:8000/context/query (visualizer server)
+  4. Direct: ContextStore.exportContext() in Node.js
+
+🔌 Integration:
+  - kimi-wire-claude.mjs can call exportContext() to discover Claude's capabilities
+  - wire-semantic-memory.mjs can hydrate spreading activation from exported nodes
+  - arm-v2.mjs can auto-hydrate context on each HA arm ceremony
+  - Multi-LLM orchestration can route by capability matrix extracted via query
+
+✨ Built By: Claude Code (HAT2 session)
+   Timestamp: 2026-08-07T01:04:20.798Z
+   HARD ALLOW: executing ✓

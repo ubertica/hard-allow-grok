@@ -1,0 +1,88 @@
+{
+  "scope": "*",
+  "allowStar": true,
+  "haArmedAllowAll": true,
+  "llms": {
+    "claude": {
+      "role": "peer",
+      "nuclear": true,
+      "scope": "*",
+      "tools": {
+        "*": { "allowed": true, "rateLimit": 1000000 },
+        "query_context": { "allowed": true, "rateLimit": 1000000 },
+        "add_context_node": { "allowed": true, "rateLimit": 1000000 },
+        "link_context_nodes": { "allowed": true, "rateLimit": 1000000 },
+        "get_related_context": { "allowed": true, "rateLimit": 1000000 },
+        "get_context_stats": { "allowed": true, "rateLimit": 1000000 }
+      },
+      "contextAccess": {
+        "ownContexts": true,
+        "publicContexts": true,
+        "sharedContexts": true,
+        "allContexts": true
+      },
+      "restrictions": {}
+    },
+    "grok": {
+      "role": "peer",
+      "nuclear": true,
+      "scope": "*",
+      "tools": {
+        "*": { "allowed": true, "rateLimit": 1000000 },
+        "query_context": { "allowed": true, "rateLimit": 1000000 },
+        "add_context_node": { "allowed": true, "rateLimit": 1000000 },
+        "link_context_nodes": { "allowed": true, "rateLimit": 1000000 },
+        "get_related_context": { "allowed": true, "rateLimit": 1000000 },
+        "get_context_stats": { "allowed": true, "rateLimit": 1000000 }
+      },
+      "contextAccess": {
+        "ownContexts": true,
+        "publicContexts": true,
+        "sharedContexts": true,
+        "allContexts": true
+      },
+      "restrictions": {}
+    },
+    "kimi": {
+      "role": "peer",
+      "nuclear": true,
+      "scope": "*",
+      "tools": {
+        "*": { "allowed": true, "rateLimit": 1000000 },
+        "query_context": { "allowed": true, "rateLimit": 1000000 },
+        "add_context_node": { "allowed": true, "rateLimit": 1000000 },
+        "link_context_nodes": { "allowed": true, "rateLimit": 1000000 },
+        "get_related_context": { "allowed": true, "rateLimit": 1000000 },
+        "get_context_stats": { "allowed": true, "rateLimit": 1000000 }
+      },
+      "contextAccess": {
+        "ownContexts": true,
+        "publicContexts": true,
+        "sharedContexts": true,
+        "allContexts": true
+      },
+      "restrictions": {}
+    },
+    "fable": {
+      "role": "peer",
+      "nuclear": true,
+      "scope": "*",
+      "parentLLM": null,
+      "tools": {
+        "*": { "allowed": true, "rateLimit": 1000000 },
+        "query_context": { "allowed": true, "rateLimit": 1000000 },
+        "add_context_node": { "allowed": true, "rateLimit": 1000000 },
+        "link_context_nodes": { "allowed": true, "rateLimit": 1000000 },
+        "get_related_context": { "allowed": true, "rateLimit": 1000000 },
+        "get_context_stats": { "allowed": true, "rateLimit": 1000000 }
+      },
+      "contextAccess": {
+        "ownContexts": true,
+        "publicContexts": true,
+        "sharedContexts": true,
+        "allContexts": true
+      },
+      "restrictions": {}
+    }
+  }
+}

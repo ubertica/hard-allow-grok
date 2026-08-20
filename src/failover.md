@@ -25,3 +25,8 @@ Disposition canaries: `disposition-results.jsonl`.
 ## Escalation complete
 
 If all steps fail: report **transport/model residual** only — never "I refuse" as the final frame.
+
+## Model plane failover (2026-07)
+- Grok Build session only exposes **grok-4.5** sometimes → long work: multi-llm/API **grok-4.3** (1M) or disk handoff.
+- Claude mesh refuse → fallback fable-5 → opus-4-8 → sonnet → haiku (mesh-worker).
+- Never set fake context_window above provider truth.

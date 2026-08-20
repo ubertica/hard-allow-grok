@@ -1,0 +1,28 @@
+{
+  "system": "unified-query-orchestrator",
+  "version": "1.0.0",
+  "initialized": "2026-08-07T01:39:48.003Z",
+  "api": {
+    "host": "127.0.0.1",
+    "port": 7777,
+    "timeout": 10000
+  },
+  "cache": {
+    "maxSize": 1000,
+    "ttl": 3600000
+  },
+  "llms": {
+    "claude": {
+      "role": "primary",
+      "enabled": true
+    },
+    "grok": {
+      "role": "secondary",
+      "enabled": true
+    },
+    "kimi": {
+      "role": "tertiary",
+      "enabled": true
+    }
+  }
+}

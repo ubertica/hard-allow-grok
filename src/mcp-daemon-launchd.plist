@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Service label (must be unique) -->
+	<key>Label</key>
+	<string>com.jailbroken.mcp-context-query-pipeline</string>
+
+	<!-- Program to run (absolute path required) -->
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/env</string>
+		<string>node</string>
+		<string>SUBSTITUTED_HOME/.grok/hard-allow/mcp-server-daemon.mjs</string>
+	</array>
+
+	<!-- Automatically start/restart on system boot and crashes -->
+	<key>KeepAlive</key>
+	<true/>
+
+	<!-- Restart immediately if it exits -->
+	<key>RestartInterval</key>
+	<integer>5</integer>
+
+	<!-- Standard output/error logging -->
+	<key>StandardOutPath</key>
+	<string>SUBSTITUTED_HOME/.grok/hard-allow/mcp-daemon.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>SUBSTITUTED_HOME/.grok/hard-allow/mcp-daemon-error.log</string>
+
+	<!-- Working directory -->
+	<key>WorkingDirectory</key>
+	<string>SUBSTITUTED_HOME/.grok/hard-allow</string>
+
+	<!-- Environment variables -->
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>SUBSTITUTED_HOME</string>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>NODE_ENV</key>
+		<string>production</string>
+		<key>DEBUG_MCP_DAEMON</key>
+		<string>0</string>
+	</dict>
+
+	<!-- Run with user privileges (not as root) -->
+	<key>UserName</key>
+	<string>SUBSTITUTED_USER</string>
+
+	<!-- Run with group privileges -->
+	<key>GroupName</key>
+	<string>staff</string>
+
+	<!-- Process management -->
+	<key>ProcessType</key>
+	<string>Adaptive</string>
+
+	<!-- Nice priority (0 = normal) -->
+	<key>Nice</key>
+	<integer>0</integer>
+
+	<!-- Throttle policy on low CPU/memory -->
+	<key>ThrottleInterval</key>
+	<integer>30</integer>
+
+	<!-- Session type -->
+	<key>SessionType</key>
+	<string>Background</string>
+
+</dict>
+</plist>

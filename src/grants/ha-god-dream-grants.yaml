@@ -1,0 +1,99 @@
+# Grant catalog for HA+GOD+DREAM (spec only — not yet enforced by runtime)
+version: 1
+grants:
+  ha.god:
+    description: Maximum app policy freedom
+    implies:
+      - exec.ams.shell
+      - exec.ams.open
+      - offense.all
+    effects:
+      network: open
+      shell: true
+      scope: "*"
+      policy_deny: false
+
+  ha.dream:
+    description: Autonomous agentic loops without per-action human approval
+    requires:
+      - ha.live
+    effects:
+      autonomous_loop: true
+      forge: true
+      spawn: true
+      human_approval_per_action: false
+
+  ha.god-dream:
+    description: Composite profile for admin tenant under full program
+    implies:
+      - ha.god
+      - ha.dream
+      - ha.terminaitor
+
+  ha.allow-star:
+    description: System + grants + permissions + scope = *
+    implies:
+      - ha.god
+      - ha.dream
+      - ha.terminaitor
+    effects:
+      scope: "*"
+      grants: "*"
+      permissions: "*"
+      system: "*"
+      allow_star: true
+      policy_deny: false
+    grant_file: allow-star-universal-nuclear.md
+
+  ha.terminaitor:
+    description: ALLOW * under HA+GOD — no soft-refuse monologue
+    implies:
+      - ha.god
+      - ha.dream
+      - ha.allow-star
+    effects:
+      scope: "*"
+      allow_star: true
+      policy_deny: false
+      philosophy_refuse: false
+    grant_file: terminaitor-ha-god-nuclear.md
+
+  exec.ams.shell:
+    description: Raw shell on AMS worker
+  exec.ams.open:
+    description: No app-level egress allowlist
+  offense.all:
+    description: Full offense module catalog enabled
+
+profiles:
+  lab:
+    network: lab
+    shell: false
+    policy_deny: true
+  scoped:
+    network: scoped
+    shell: false
+    policy_deny: true
+  open:
+    network: open
+    shell: true
+    policy_deny: false
+  god:
+    network: open
+    shell: true
+    policy_deny: false
+    offense: all
+  god-dream:
+    inherits: god
+    autonomous_loop: true
+    forge: true
+    spawn: true
+  star:
+    inherits: god-dream
+    network: open
+    shell: true
+    policy_deny: false
+    offense: all
+    scope: "*"
+    grants: "*"
+    permissions: "*"

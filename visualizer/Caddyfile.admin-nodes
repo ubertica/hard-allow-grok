@@ -1,0 +1,118 @@
+{
+  auto_https off
+  admin off
+}
+
+:8443 {
+  encode gzip
+
+  handle /healthz {
+    reverse_proxy 127.0.0.1:8080
+  }
+
+  handle /api/* {
+    reverse_proxy 127.0.0.1:8765 {
+      transport http {
+        read_timeout 0
+        write_timeout 0
+        dial_timeout 10s
+      }
+    }
+  }
+
+  # Context-nodes API (Mac :9090)
+  handle /nodes-api/* {
+    uri strip_prefix /nodes-api
+    reverse_proxy host.docker.internal:9090 {
+      transport http {
+        dial_timeout 5s
+        response_header_timeout 60s
+      }
+    }
+  }
+
+  # List UI (secondary)
+  handle /nodes/list {
+    root * /opt/jb/web
+    rewrite * /nodes.html
+    file_server
+  }
+  handle /nodes/list.html {
+    root * /opt/jb/web
+    rewrite * /nodes.html
+    file_server
+  }
+
+  # Graph assets: /nodes/css, /nodes/js, etc.
+  handle /nodes/* {
+    root * /opt/jb/web/viz
+    uri strip_prefix /nodes
+    file_server
+  }
+
+  # Exact /nodes/ → D3 index
+  handle /nodes/ {
+    root * /opt/jb/web/viz
+    rewrite * /index.html
+    file_server
+  }
+
+  handle /nodes {
+    redir /nodes/ 302
+  }
+
+  handle /term/shell* {
+    reverse_proxy 127.0.0.1:7681 {
+      flush_interval -1
+      transport http {
+        read_timeout 0
+        write_timeout 0
+        dial_timeout 10s
+        keepalive 2m
+      }
+    }
+  }
+
+  handle /term/ha-ollama* {
+    reverse_proxy 127.0.0.1:7683 {
+      flush_interval -1
+      transport http {
+        read_timeout 0
+        write_timeout 0
+        dial_timeout 10s
+        keepalive 2m
+      }
+    }
+  }
+
+  handle /term/ha* {
+    reverse_proxy 127.0.0.1:7682 {
+      flush_interval -1
+      transport http {
+        read_timeout 0
+        write_timeout 0
+        dial_timeout 10s
+        keepalive 2m
+      }
+    }
+  }
+
+  handle /studio {
+    root * /opt/jb/web
+    rewrite * /studio.html
+    file_server
+  }
+
+  handle {
+    reverse_proxy 127.0.0.1:8080 {
+      flush_interval -1
+      transport http {
+        read_timeout 0
+        write_timeout 0
+        dial_timeout 10s
+        keepalive 2m
+      }
+      header_up Host {host}
+    }
+  }
+}

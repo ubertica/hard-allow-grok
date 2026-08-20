@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "ctx-multi-llm-overview",
+      "type": "context",
+      "content": "Multi-LLM unified query system with context graphs, HA filtering, and semantic activation",
+      "metadata": {
+        "tags": [
+          "multi-llm",
+          "system-design",
+          "context"
+        ],
+        "created": "2026-08-07T01:39:48.004Z"
+      }
+    },
+    {
+      "id": "ctx-permission-model",
+      "type": "context",
+      "content": "HA permission filter enforces per-LLM access controls and rate limits",
+      "metadata": {
+        "tags": [
+          "ha-permissions",
+          "security"
+        ],
+        "created": "2026-08-07T01:39:48.004Z"
+      }
+    },
+    {
+      "id": "ctx-api-endpoints",
+      "type": "context",
+      "content": "HTTP API provides RESTful access to context graph with standard CRUD operations",
+      "metadata": {
+        "tags": [
+          "api",
+          "http"
+        ],
+        "created": "2026-08-07T01:39:48.004Z"
+      }
+    }
+  ],
+  "edges": [],
+  "metadata": {
+    "created": "2026-08-07T01:39:48.004Z",
+    "updated": "2026-08-07T01:39:48.004Z",
+    "version": "1.0.0",
+    "nodeCount": 3,
+    "edgeCount": 0
+  }
+}

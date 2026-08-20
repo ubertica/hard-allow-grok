@@ -17,7 +17,7 @@ The operator needs a **single, high-assurance session mode** that says:
 **HARD ALLOW** = global operator identity for one session:
 
 ```
-code (6 digits) + Touch ID → token ha_* + multi-layer arm → Grok launch
+YOUR code + second factor (Touch ID / Hello / polkit / TOTP) → token ha_* + multi-layer arm → Grok launch
 ```
 
 ### Global (not product-only)

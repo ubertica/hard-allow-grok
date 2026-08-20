@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HARD ALLOW Context Graph</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="ha-badge">HA</span>
+        <h1 data-i18n="title">HARD ALLOW Context Graph</h1>
+        <span id="live-pill" class="live-pill"><span class="dot"></span> LIVE</span>
+      </div>
+      <div class="controls">
+        <div class="search-wrap">
+          <input type="text" id="node-search" data-i18n-placeholder="search" placeholder="Search nodes..." autocomplete="off">
+          <div id="search-suggestions" class="suggestions"></div>
+        </div>
+        <button id="btn-hydrate" title="Re-hydrate context nodes">⟳ Hydrate</button>
+        <button id="btn-mode" title="Toggle layout">⧉ Force</button>
+        <button id="btn-fit" title="Fit to screen">⊘ Fit</button>
+        <button id="btn-export" title="Export graph">⬇ Export</button>
+        <button id="btn-theme" title="Toggle theme">◐</button>
+        <select id="lang-select">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+        </select>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="filters card">
+        <h3 data-i18n="filters">Filters</h3>
+        <div class="filter-grid">
+          <label class="chip system"><input type="checkbox" class="filter-cat" value="system" checked> <span data-i18n="cat.system">System</span></label>
+          <label class="chip agents"><input type="checkbox" class="filter-cat" value="agents" checked> <span data-i18n="cat.agents">Agents</span></label>
+          <label class="chip projects"><input type="checkbox" class="filter-cat" value="projects" checked> <span data-i18n="cat.projects">Projects</span></label>
+          <label class="chip hardAllow"><input type="checkbox" class="filter-cat" value="hardAllow" checked> <span data-i18n="cat.hardAllow">HARD ALLOW</span></label>
+        </div>
+      </div>
+
+      <div class="path-finder card">
+        <h3 data-i18n="pathFinder">Path Finder</h3>
+        <input type="text" id="path-from" data-i18n-placeholder="pathFrom" placeholder="From node..." autocomplete="off">
+        <input type="text" id="path-to" data-i18n-placeholder="pathTo" placeholder="To node..." autocomplete="off">
+        <div class="path-actions">
+          <button id="btn-find-path" data-i18n="findPath">Find Path</button>
+          <button id="btn-clear-path" data-i18n="clear">Clear</button>
+        </div>
+        <div id="path-result" class="path-result"></div>
+      </div>
+
+      <div class="details card" id="details-panel">
+        <div class="details-header">
+          <h3 data-i18n="details">Details</h3>
+          <div class="detail-actions">
+            <button id="btn-edit-node" data-i18n="edit">Edit</button>
+            <button id="btn-delete-node" data-i18n="delete">Delete</button>
+          </div>
+        </div>
+        <div class="details-tabs">
+          <button class="tab-btn active" data-tab="overview" data-i18n="overview">Overview</button>
+          <button class="tab-btn" data-tab="content" data-i18n="content">Content</button>
+          <button class="tab-btn" data-tab="raw" data-i18n="raw">Raw JSON</button>
+          <button class="tab-btn" data-tab="relations" data-i18n="relations">Relations</button>
+          <button class="tab-btn" data-tab="children" data-i18n="children">Children</button>
+        </div>
+        <div class="details-body">
+          <p class="empty" data-i18n="selectNode">Select a node to see details.</p>
+        </div>
+      </div>
+
+      <div class="create-node card">
+        <h3 data-i18n="createNode">Create Node / Edge</h3>
+        <select id="create-type">
+          <option value="node" data-i18n="newNode">New node</option>
+          <option value="edge" data-i18n="newEdge">New edge</option>
+        </select>
+        <input type="text" id="create-id" placeholder="node.id or edge type">
+        <input type="text" id="create-value" placeholder="value / target node">
+        <button id="btn-create" data-i18n="create">Create</button>
+      </div>
+
+      <div class="ask-llm card">
+        <h3 data-i18n="askLLM">Ask LLM Interpreter</h3>
+        <select id="llm-provider">
+          <option value="claude">Claude (now)</option>
+          <option value="grok">Grok (after 18h AR)</option>
+        </select>
+        <textarea id="llm-question" rows="3" placeholder="Ask about the context graph..."></textarea>
+        <button id="btn-ask-llm" data-i18n="ask">Ask</button>
+        <div id="llm-answer" class="llm-answer"></div>
+      </div>
+
+      <div class="stats card">
+        <h3 data-i18n="stats">Stats</h3>
+        <div class="stat-grid">
+          <div><span data-i18n="nodes">Nodes</span><b id="stat-nodes">0</b></div>
+          <div><span data-i18n="edges">Edges</span><b id="stat-edges">0</b></div>
+          <div><span data-i18n="lastSync">Last sync</span><b id="stat-last-sync">-</b></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="graph-container">
+      <svg id="graph"></svg>
+      <canvas id="minimap"></canvas>
+      <div id="tooltip" class="tooltip"></div>
+      <div class="graph-overlay" id="graph-overlay"></div>
+    </main>
+  </div>
+
+  <div id="export-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 data-i18n="exportTitle">Export Graph</h3>
+      <div class="export-options">
+        <button data-format="png">PNG Image</button>
+        <button data-format="svg">SVG Vector</button>
+        <button data-format="json">JSON State</button>
+        <button data-format="jsonl">JSONL Edges</button>
+      </div>
+      <button class="close-modal" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

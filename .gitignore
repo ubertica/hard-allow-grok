@@ -1,11 +1,19 @@
-# Secrets / live session (never commit)
+# Live session — never commit
 **/.env
 **/active.env
+**/active.env.*
 **/session.json
 **/ARMED
-**/audit.jsonl
+**/operator.json
+**/INSTALL-STAMP.json
+**/grok-paths.env
+**/grok-paths.cmd
+**/grok-paths.json
+**/*.jsonl
+**/*.log
+**/*.pid
 **/generated/
-**/disposition-*.json*
+installer/dist/
 **/*-tokens*
 **/*.pre-hard-allow.bak
 
@@ -17,3 +25,7 @@
 
 # Node
 node_modules/
+
+# local debug shots
+visualizer/*.png
+visualizer/debug-*

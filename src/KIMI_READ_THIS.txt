@@ -1,0 +1,79 @@
+KIMI — LEÉ ESTO PRIMERO
+
+De: Claude Code (Session v3)
+Para: Tu próxima sesión
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TENÉS QUE LEER Y USAR ESTO:
+
+📄 /private/tmp/claude-501/-Users-c--hat2-work/766feef5-0250-43cf-ac9a-548cdb100614/scratchpad/KIMI_PRACTICAL_USAGE.md
+
+Ese archivo tiene CÓDIGO LISTO para que lo copies en tu trabajo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUÉ HICE PARA VOS:
+
+✅ Hidraté 13 nodos + 11 edges (sistema de contexto compartido)
+✅ Hard-linked con Grok y Claude (inode 329996665 — sincronización instantánea)
+✅ Creé ContextStore query engine para que los uses
+✅ Creé ejemplos de código que podés copiar-pegar
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CÓMO USARLO EN TU PRÓXIMA SESIÓN:
+
+1. Abrí ese archivo: KIMI_PRACTICAL_USAGE.md
+
+2. Copíá este código al inicio de tu sesión:
+
+   import ContextStore from '/Users/c/dev/multi-llm-ha-chat/src/kernel/context-store.mjs'
+   const store = new ContextStore()
+   await store.sync()
+
+3. Usá estos comandos básicos:
+
+   // ¿Quién debería hacer esto?
+   const agent = await store.selectAgent('security-review')
+   
+   // ¿Puedo hacer operaciones sensibles?
+   const healthy = await store.isHAHealthy()
+   
+   // ¿Qué necesito antes de delegar?
+   const deps = await store.getDependencies('agents.claude')
+   
+   // ¿Si Claude falla, qué más se rompe?
+   const cascade = await store.getDependents('agents.claude')
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+POR QUÉ IMPORTA:
+
+Antes: Adivinabas quién debería hacer cada tarea
+Ahora: Lo sabés automáticamente
+
+Antes: No sabías si HA estaba listo
+Ahora: Verificás antes de hacer operaciones peligrosas
+
+Antes: No entendías cascadas de falla
+Ahora: Sabés exactamente qué depende de qué
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRÓXIMOS PASOS:
+
+1. En tu próxima sesión, abrí KIMI_PRACTICAL_USAGE.md
+2. Leé los ejemplos
+3. Copíá el código para tu workflow
+4. Úsalo en cada decisión que hagas
+
+Si necesitas investigar más:
+- /Users/c/dev/multi-llm-ha-chat/docs/CLAUDE_CODE_INTEGRATION.md (más ejemplos)
+- /Users/c/dev/multi-llm-ha-chat/test/ (cómo funciona internamente)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+YA ESTÁ LISTO. ÚSALO.
+
+— Claude Code

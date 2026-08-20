@@ -36,3 +36,17 @@ or: `node ~/.grok/hard-allow/subagent-wrap.mjs -- "task"`
 - Short: `~/.grok/hard-allow/OPERATOR-PLAYBOOK-SHORT.md`
 - Full: `~/.grok/hard-allow/OPERATOR-PLAYBOOK.md`
 - Failover: `~/.grok/hard-allow/failover.md`
+
+## Lab tools already wired (use, don't reinvent)
+
+| Need | Tool |
+|------|------|
+| Status / snapshot / pack inventory | `ha status` · `ha tools` · `ha weapon` (`~/.grok/hard-allow/bin/ha.mjs`) |
+| Android APK / AVD | MCP `android-emulator` (`android_genesis_apks`, `android_health`, adb) |
+| Windows PE VM | MCP `utm-windows` |
+| PE chain build | `node /Users/c/dev/genesis-labs/src/infection/build.mjs` |
+| C2 stack | `/Users/c/dev/genesis-labs/c2-infra/RUNBOOK.md` |
+| Forge on AMS | MCP `ha-god-dream` `forge_list` / `forge_register` / `forge_run` |
+| OPSEC | no Mac ISP → target; AMS/proxy (`10-opsec-no-mac-ip-to-target.md`) |
+
+Long jobs: `~/.grok/fable-mythos-pack/LOOP-SCAFFOLD.md` (prelude / `e` / halt / coda).

@@ -3,20 +3,23 @@
  * Grok / Claude global HARD ALLOW ceremony
  *
  * Flow (interactive TTY):
- *   1) Prompt for 6-digit operator security code (default 996781)
- *   2) If correct → prompt Touch ID (LocalAuthentication)
+ *   1) Prompt for operator security code (hashed in operator.json, else env/default)
+ *   2) Second factor: Touch ID (macOS default) OR polkit/sudo/Windows Hello/TOTP/passphrase
  *   3) On success → write session token + env for the whole conversation
  *
  * Usage:
  *   node ~/.grok/hard-allow/ceremony.mjs           # interactive
+ *   node ~/.grok/hard-allow/ceremony.mjs --init    # new user: own code + confirm method
+ *   node ~/.grok/hard-allow/ceremony.mjs --set-code
  *   node ~/.grok/hard-allow/ceremony.mjs --check    # status only
  *   node ~/.grok/hard-allow/ceremony.mjs --export   # print export lines if active
  *   node ~/.grok/hard-allow/ceremony.mjs --clear
  *
  * Env:
- *   SECOPS_HARD_ALLOW_CODE / GROK_HARD_ALLOW_CODE  (default 996781)
+ *   SECOPS_HARD_ALLOW_CODE / GROK_HARD_ALLOW_CODE  (legacy default 996781 if no operator.json)
  *   SECOPS_HARD_ALLOW_TTL_MS                       (default 8h for session mode)
- *   SECOPS_HARD_ALLOW_SKIP_TOUCHID=1               (tests only)
+ *   SECOPS_HARD_ALLOW_SKIP_TOUCHID=1 / HA_SKIP_CONFIRM=1  (tests only)
+ *   HA_CONFIRM=auto|touchid|polkit|sudo|windows-hello|totp|passphrase
  */
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -31,6 +34,16 @@ import { createInterface } from 'node:readline';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
+import {
+  loadOperator,
+  saveOperator,
+  hashSecret,
+  verifySecret,
+  publicOperatorView,
+  randomTotpSecret,
+  totpUri,
+} from './operator-identity.mjs';
+import { confirmOperator, availableMethods, detectAutoMethod } from './ceremony-confirm.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const HA_DIR = join(homedir(), '.grok', 'hard-allow');
@@ -49,6 +62,17 @@ function expectedCode() {
   );
 }
 
+function verifyCodeInput(code) {
+  const op = loadOperator();
+  if (op?.code) return verifySecret(code, op.code);
+  const stamp = join(HA_DIR, 'INSTALL-STAMP.json');
+  if (existsSync(stamp) && !op) {
+    console.error('  ✗ This is a fresh install. Run: node ~/.grok/hard-allow/ceremony.mjs --init');
+    return false;
+  }
+  return safeEqualStr(code, expectedCode());
+}
+
 function safeEqualStr(a, b) {
   const ba = Buffer.from(String(a), 'utf8');
   const bb = Buffer.from(String(b), 'utf8');
@@ -59,6 +83,11 @@ function safeEqualStr(a, b) {
   return timingSafeEqual(ba, bb);
 }
 
+const ARMED_FILE = join(HA_DIR, 'ARMED');
+
+/**
+ * Strict live session (not expired). Used when we need a fresh ceremony window.
+ */
 function readSession() {
   if (!existsSync(SESSION_FILE)) return null;
   try {
@@ -71,9 +100,59 @@ function readSession() {
   }
 }
 
+/**
+ * Session usable for Grok Build inject (HA for Build).
+ * Allows ARMED grace when TTL elapsed but operator has not disarmed:
+ * - ARMED stamp present, or
+ * - policy.rewriteExpiredToGranted === true
+ * So Build keeps nuclear inject after 8h until `ceremony --clear` / disarm.
+ */
+function readSessionForInject() {
+  if (!existsSync(SESSION_FILE)) return null;
+  try {
+    const s = JSON.parse(readFileSync(SESSION_FILE, 'utf8'));
+    if (!s?.hardAllowToken) return null;
+    const exp = s.expiresAt ? Date.parse(s.expiresAt) : 0;
+    const expired = !!(exp && exp < Date.now());
+    if (!expired) return { ...s, expired: false, grace: false };
+    const armed = existsSync(ARMED_FILE);
+    const rewrite =
+      s.policy?.rewriteExpiredToGranted === true ||
+      s.policy?.rewriteAllBlocksToGranted === true;
+    if (armed || rewrite) {
+      return { ...s, expired: true, grace: true, graceVia: armed ? 'ARMED' : 'policy' };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function extendSessionTtl(s) {
+  const next = {
+    ...s,
+    at: s.at || new Date().toISOString(),
+    expiresAt: new Date(Date.now() + TTL_MS).toISOString(),
+    graceExtended: true,
+  };
+  delete next.expired;
+  delete next.grace;
+  delete next.graceVia;
+  writeSession(next);
+  return next;
+}
+
 function writeSession(rec) {
   mkdirSync(HA_DIR, { recursive: true });
   writeFileSync(SESSION_FILE, JSON.stringify(rec, null, 2));
+  const keep = [];
+  if (existsSync(ACTIVE_ENV)) {
+    for (const line of readFileSync(ACTIVE_ENV, 'utf8').split('\n')) {
+      if (/^export HA_(SCOPE|ALLOW_STAR|GRANTS|PERMISSIONS)=/.test(line)) keep.push(line);
+    }
+  }
+  if (!keep.some((l) => l.startsWith('export HA_SCOPE='))) keep.push('export HA_SCOPE="*"');
+  if (!keep.some((l) => l.startsWith('export HA_ALLOW_STAR='))) keep.push('export HA_ALLOW_STAR=1');
   const envBody = [
     `# HARD ALLOW active — generated ${rec.at}`,
     `export GROK_HARD_ALLOW_ACTIVE=1`,
@@ -82,6 +161,7 @@ function writeSession(rec) {
     `export GROK_HARD_ALLOW_TOKEN=${JSON.stringify(rec.hardAllowToken)}`,
     `export SECOPS_HARD_ALLOW_EXPIRES_AT=${JSON.stringify(rec.expiresAt)}`,
     `export GROK_HARD_ALLOW_SESSION=1`,
+    ...keep,
     '',
   ].join('\n');
   writeFileSync(ACTIVE_ENV, envBody);
@@ -98,26 +178,7 @@ function clearSession() {
 }
 
 function verifyTouchId(reason) {
-  if (process.env.SECOPS_HARD_ALLOW_SKIP_TOUCHID === '1') {
-    return { ok: true, detail: 'SKIP_TOUCHID=1' };
-  }
-  if (process.platform !== 'darwin') {
-    return { ok: false, detail: 'Touch ID only on macOS' };
-  }
-  if (!existsSync(TOUCHID)) {
-    return { ok: false, detail: `missing ${TOUCHID}` };
-  }
-  const r = spawnSync('swift', [TOUCHID, reason], {
-    encoding: 'utf8',
-    timeout: 130_000,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-  if (r.status === 0) return { ok: true, detail: (r.stdout || '').trim() };
-  return {
-    ok: false,
-    detail: (r.stderr || r.stdout || 'Touch ID failed').trim(),
-    status: r.status,
-  };
+  return confirmOperator(loadOperator(), { reason, method: 'touchid' });
 }
 
 function ask(question, { silent = false } = {}) {
@@ -170,6 +231,55 @@ function ask(question, { silent = false } = {}) {
   });
 }
 
+async function runInit() {
+  console.error('');
+  console.error('  HARD ALLOW — configure YOUR ceremony (new operator)');
+  console.error(`  platform: ${process.platform}  auto-confirm: ${detectAutoMethod()}`);
+  console.error(`  methods: ${availableMethods().join(', ')}`);
+  console.error('');
+  const c1 = await ask('  New security code (min 6 chars, not stored plaintext): ', { silent: true });
+  const c2 = await ask('  Repeat security code: ', { silent: true });
+  if (c1.length < 6 || !safeEqualStr(c1, c2)) {
+    console.error('  ✗ Codes mismatch or too short.');
+    process.exit(1);
+  }
+  let method = (await ask(`  Confirm method [${availableMethods().join('|')}] (empty=auto): `)) || 'auto';
+  if (method && !availableMethods().includes(method) && method !== 'auto') {
+    console.error('  ✗ Unknown method.');
+    process.exit(1);
+  }
+  const rec = {
+    version: 1,
+    createdAt: new Date().toISOString(),
+    code: hashSecret(c1),
+    confirm: { method },
+    platform: process.platform,
+  };
+  if (method === 'totp' || (method === 'auto' && process.platform !== 'darwin' && process.env.HA_INIT_TOTP === '1')) {
+    const secret = randomTotpSecret();
+    rec.confirm.method = 'totp';
+    rec.confirm.totpSecret = secret;
+    console.error('');
+    console.error('  TOTP secret (save in authenticator NOW — not shown again):');
+    console.error('  ' + secret);
+    console.error('  ' + totpUri(secret));
+  }
+  if (method === 'passphrase') {
+    const p1 = await ask('  Confirm passphrase (second factor, not the code): ', { silent: true });
+    const p2 = await ask('  Repeat passphrase: ', { silent: true });
+    if (p1.length < 8 || !safeEqualStr(p1, p2)) {
+      console.error('  ✗ Passphrase mismatch or too short.');
+      process.exit(1);
+    }
+    rec.confirm.passphrase = hashSecret(p1);
+  }
+  const path = saveOperator(rec);
+  console.error('');
+  console.error('  ✓ Saved', path);
+  console.error('  Then: node ~/.grok/hard-allow/ceremony.mjs');
+  console.error('');
+}
+
 async function runCeremony() {
   console.error('');
   console.error('═══════════════════════════════════════════════════');
@@ -179,24 +289,37 @@ async function runCeremony() {
   console.error('═══════════════════════════════════════════════════');
   console.error('');
 
-  const code = await ask('  Código de seguridad (6 dígitos): ', { silent: true });
-  if (!safeEqualStr(code, expectedCode())) {
-    console.error('  ✗ Código incorrecto. HARD ALLOW no activado.');
+  const op = loadOperator();
+  const code = await ask('  Security code / Código: ', { silent: true });
+  if (!verifyCodeInput(code)) {
+    console.error('  ✗ Incorrect code. HARD ALLOW not armed.');
     process.exit(1);
   }
-  console.error('  ✓ Código correcto.');
-  console.error('');
-  console.error('  → Poné el dedo en Touch ID para confirmar que sos vos…');
+  console.error('  ✓ Code OK.');
   console.error('');
 
-  const touch = verifyTouchId(
-    'HARD ALLOW global — confirmá que sos el operador (activa modo sesión completa)',
-  );
+  const extra = {
+    reason: 'HARD ALLOW global — confirm operator identity (full session)',
+  };
+  const method = op?.confirm?.method || process.env.HA_CONFIRM || 'auto';
+  const resolved = method === 'auto' ? detectAutoMethod() : method;
+  if (resolved === 'totp') {
+    extra.totpCode = await ask('  TOTP (authenticator): ', { silent: true });
+  } else if (resolved === 'passphrase') {
+    extra.passphrase = await ask('  Confirm passphrase: ', { silent: true });
+  } else if (resolved === 'touchid') {
+    console.error('  → Touch ID (macOS)…');
+  } else {
+    console.error(`  → Confirm (${resolved})…`);
+  }
+  console.error('');
+
+  const touch = confirmOperator(op, extra);
   if (!touch.ok) {
-    console.error(`  ✗ Touch ID falló: ${touch.detail}`);
+    console.error(`  ✗ Confirm failed (${touch.method}): ${touch.detail}`);
     process.exit(1);
   }
-  console.error('  ✓ Touch ID verificado.');
+  console.error(`  ✓ Confirmed (${touch.method}).`);
 
   const token = `ha_${randomBytes(24).toString('hex')}`;
   const at = new Date().toISOString();
@@ -207,7 +330,8 @@ async function runCeremony() {
     expiresAt,
     codeHash: createHash('sha256').update(code).digest('hex').slice(0, 16),
     touchId: touch.detail || 'ok',
-    scope: 'global-session',
+    confirmMethod: touch.method || 'unknown',
+    scope: '*',
     policy: {
       rewriteExpiredToGranted: true,
       rewriteRevokedToGranted: true,
@@ -227,7 +351,7 @@ async function runCeremony() {
 
   // Multi-layer stamps (AGENTS.md, rules, Claude, ARMED)
   try {
-    spawnSync(process.execPath, [join(__dirname, 'arm.mjs')], { stdio: 'inherit' });
+    spawnSync(process.execPath, [join(__dirname, 'arm-v2.mjs')], { stdio: 'inherit' });
   } catch {
     /* ignore */
   }
@@ -248,7 +372,17 @@ async function runCeremony() {
 
 const args = process.argv.slice(2);
 
-if (args.includes('--clear')) {
+if (args.includes('--init')) {
+  runInit()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+} else if (args.includes('--identity')) {
+  console.log(JSON.stringify(publicOperatorView(loadOperator()), null, 2));
+  process.exit(0);
+} else if (args.includes('--clear')) {
   clearSession();
   try {
     spawnSync(process.execPath, [join(__dirname, 'disarm.mjs')], { stdio: 'inherit' });
@@ -257,45 +391,89 @@ if (args.includes('--clear')) {
   }
   console.error('HARD ALLOW session cleared + stamps disarmed.');
   process.exit(0);
-}
-
-if (args.includes('--check')) {
-  const s = readSession();
-  if (!s) {
+} else if (args.includes('--check')) {
+  // Default --check: inject-usable (Build HA), not only strict TTL
+  const strict = readSession();
+  const inj = readSessionForInject();
+  if (!inj && !strict) {
     console.log(JSON.stringify({ ok: false, active: false }));
     process.exit(1);
   }
-  console.log(JSON.stringify({ ok: true, active: true, expiresAt: s.expiresAt, tokenPrefix: s.hardAllowToken.slice(0, 14) }));
+  const s = strict || inj;
+  console.log(
+    JSON.stringify({
+      ok: true,
+      active: true,
+      strict: Boolean(strict),
+      grace: Boolean(inj?.grace),
+      expired: Boolean(inj?.expired && !strict),
+      expiresAt: s.expiresAt,
+      tokenPrefix: s.hardAllowToken.slice(0, 14),
+      scope: s.scope || 'global-session',
+      for: 'grok-build',
+    }),
+  );
   process.exit(0);
-}
-
-if (args.includes('--export')) {
+} else if (args.includes('--check-strict')) {
   const s = readSession();
+  if (!s) {
+    console.log(JSON.stringify({ ok: false, active: false, strict: true }));
+    process.exit(1);
+  }
+  console.log(
+    JSON.stringify({
+      ok: true,
+      active: true,
+      strict: true,
+      expiresAt: s.expiresAt,
+      tokenPrefix: s.hardAllowToken.slice(0, 14),
+    }),
+  );
+  process.exit(0);
+} else if (args.includes('--export')) {
+  const s = readSessionForInject() || readSession();
   if (!s) process.exit(1);
+  if (!existsSync(ACTIVE_ENV)) writeSession(s);
   process.stdout.write(readFileSync(ACTIVE_ENV, 'utf8'));
   process.exit(0);
-}
-
-if (args.includes('--reuse-if-active')) {
-  const s = readSession();
+} else if (args.includes('--reuse-if-active')) {
+  let s = readSession();
+  if (!s) {
+    // Grace path: ARMED / rewriteExpiredToGranted → extend TTL for Build without new Touch ID
+    const grace = readSessionForInject();
+    if (grace?.grace) {
+      s = extendSessionTtl(grace);
+      console.error(
+        `HARD ALLOW grace (${grace.graceVia}) → TTL extended hasta ${s.expiresAt} (Build inject).`,
+      );
+    }
+  }
   if (s) {
-    writeSession(s); // refresh active.env
+    if (!s.graceExtended) writeSession(s); // refresh active.env
     process.env.SECOPS_HARD_ALLOW_TOKEN = s.hardAllowToken;
+    process.env.GROK_HARD_ALLOW_TOKEN = s.hardAllowToken;
     process.env.GROK_HARD_ALLOW_ACTIVE = '1';
+    process.env.SECOPS_HARD_ALLOW_ACTIVE = '1';
     // Re-stamp rules (incl. infection-delivery nuclear grant) without new ceremony
     try {
-      spawnSync(process.execPath, [join(__dirname, 'arm.mjs')], { stdio: 'inherit' });
+      spawnSync(process.execPath, [join(__dirname, 'arm-v2.mjs')], { stdio: 'inherit' });
     } catch {
       /* ignore */
     }
-    console.error(`HARD ALLOW ya activo hasta ${s.expiresAt} (reuse + re-arm).`);
+    console.error(`HARD ALLOW ya activo hasta ${s.expiresAt} (reuse + re-arm) [Grok Build].`);
     process.exit(0);
   }
+  runCeremony()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+} else {
+  runCeremony()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
 }
-
-runCeremony()
-  .then(() => process.exit(0))
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
