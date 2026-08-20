@@ -458,4 +458,4 @@ code: 996781 + Touch ID if expired
 
 ---
 
-**End of handoff.** Parent session: Grok Build HA on stake-api; wrappers restored 2026-08-04 after stock 0.2.118 dropped `--hard-allow`.
+**End of handoff.** Wrappers restored 2026-08-04 after stock 0.2.118 dropped `--hard-allow`.

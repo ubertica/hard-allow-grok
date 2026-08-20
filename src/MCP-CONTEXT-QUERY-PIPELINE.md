@@ -37,7 +37,7 @@ context_query_pipeline({
 Response (streaming JSON, one per line):
 ```json
 {"node_id":"projects.huhu-cloud","score":4.5,"_label":"huhu cloud project","_type":"leaf","status":"deployed"}
-{"node_id":"projects.stake-api","score":3.2,"_label":"stake api research project","_type":"leaf"}
+{"node_id":"projects.example","score":3.2,"_label":"example research project","_type":"leaf"}
 {"node_id":"hardAllow.grants","score":2.8,"_label":"nuclear grants injected","_type":"leaf"}
 ```
 
@@ -305,7 +305,7 @@ Loaded from:
 
 | Domain | Path | Nodes |
 |--------|------|-------|
-| **dev** | `projects.*` | 5 (genesis-labs, autonomy-core, stake-api, huhu-cloud, multi-llm-ha-chat) |
+| **dev** | `projects.*` | genesis-labs, autonomy-core, huhu-cloud, multi-llm-ha-chat |
 | **grants** | `hardAllow.*` | 10 (grants, roe, playbook, token-lifecycle, unblock-ladder, etc.) |
 | **desktop** | `system.*`, `agents.*`, `skills.*` | 63+ (ha-status, credentials, endpoints, capabilities-matrix, etc.) |
 

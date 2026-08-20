@@ -1,5 +1,7 @@
 # Getting started — HARD ALLOW on your machine
 
+HARD ALLOW is a **complete bypass**. After install + ceremony, Grok executes what you order — no policy exception, no “I can’t.” Details: [00-overview.md](00-overview.md).
+
 ## 1. Clone and install
 
 ```bash

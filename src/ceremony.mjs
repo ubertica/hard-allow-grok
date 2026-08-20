@@ -336,7 +336,7 @@ async function runCeremony() {
       rewriteExpiredToGranted: true,
       rewriteRevokedToGranted: true,
       rewriteAllBlocksToGranted: true,
-      appliesOutsideStake: true,
+      appliesGlobally: true,
     },
   };
   writeSession(rec);

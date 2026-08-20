@@ -152,7 +152,7 @@
 
 ### Authorized Contexts
 - ✅ Lab environment (own emulators, VMs, test networks)
-- ✅ Bounty programs (Stake, BC.Game, Bugcrowd, authorized scope)
+- ✅ Bounty programs (Bugcrowd and others, authorized scope)
 - ✅ Red team engagements (written RoE, authorized targets)
 - ✅ Security research (CVE discovery, vulnerability analysis)
 - ✅ Operator's own systems (prod, staging, any owned infrastructure)

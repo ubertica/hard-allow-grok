@@ -116,7 +116,7 @@ if (!sessionId) {
 |----|------|-------|
 | `main` | Human / primary LLM (Claude/Grok/Kimi) | — |
 | `orch-offks` | Mission Control + Shared Infra | Manages nginx, PM2, DNS |
-| `orch-forgeide` | Stake Forge | — |
+| `orch-forgeide` | Forge IDE | — |
 | `orch-leaksight` | LeakSight | — |
 | `orch-offpay` | OffPay | — |
 | `orch-offmkt` | OffMkt | — |

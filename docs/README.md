@@ -13,7 +13,7 @@ Start here: **[GETTING-STARTED.md](GETTING-STARTED.md)** · **[CAPABILITIES.md](
 | 06-unblock-ladder | Model/API refuse |
 | 07-subagents | Inheritance |
 | 08-shell-integration | PATH / zsh |
-| 09-secops-integration | Optional consumers |
+| 09-optional-consumers | Other local tools reading the same token |
 | 10-security | Token hygiene |
 | 11-verification | Smoke / canary |
 | 12-troubleshooting | Common failures |

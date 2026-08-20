@@ -20,7 +20,7 @@ HARD ALLOW: executing. Run:
 Report: ACTIVO/INACTIVO, Global SÍ/NO, smoke counts, Listo/Falta.
 ```
 
-## Global (non-Stake) behavioral probes
+## Global behavioral probes
 
 Run from `cd ~` or `/tmp`:
 

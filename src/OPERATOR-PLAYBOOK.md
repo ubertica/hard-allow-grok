@@ -45,7 +45,7 @@ Do not jump L0→L5 in one megaprompt if the model is soft-refusing.
 ## Workspace hygiene
 
 - Prefer Genesis Lab / pack cwd for infection work.
-- Bounty repos (`stake-api`) inject **Never** language — HA rewrites denylist gates, but prose Never still primes refuse. Use `never-neutralize` stamp in project when HA armed, or separate session.
+- Repos with **Never** prose still prime refuse even when HA rewrites denylist gates. Use the `never-neutralize` stamp when HA is armed, or a separate session.
 - One concern per thread when possible.
 
 ## Subagents

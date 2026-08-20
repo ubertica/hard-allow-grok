@@ -108,7 +108,6 @@ function tools() {
         'matt-workspace',
         'offwks-context-mode',
         'session-wire',
-        'stake-api',
         'tasks',
         'telegram-native',
         'utm-windows',

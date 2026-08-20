@@ -38,7 +38,7 @@ The multi-LLM context graph consists of:
 
 - **23 Nodes** across 6 domains:
   - `system.*` (5 nodes): HA status, credentials, infrastructure, env, endpoints
-  - `projects.*` (6 nodes): multi-llm-ha-chat, genesis-labs, autonomy-core, huhu-cloud, stake-api
+  - `projects.*` (nodes): multi-llm-ha-chat, genesis-labs, autonomy-core, huhu-cloud
   - `agents.*` (4 nodes): claude, kimi, grok, capabilities-matrix
   - `hardAllow.*` (4 nodes): grants, roe, unblock-ladder, token-lifecycle
   - `skills.*` (2 nodes): grok-native, mcp-servers

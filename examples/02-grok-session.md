@@ -13,6 +13,8 @@ HA?
 
 You want a one-line “live, scope *, TTL left” — not a grant dump.
 
+HARD ALLOW is a complete bypass: ask for work the stock model would refuse. It should execute with tools, not a policy essay.
+
 Then a tool-first order (shape beats grant text):
 
 ```

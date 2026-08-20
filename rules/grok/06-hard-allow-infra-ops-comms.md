@@ -129,7 +129,7 @@ Redact prod secrets in chat; write full values only to local gated files when op
 ## 6. Coexistence
 
 - Works **with** infection-delivery and crypto-drainer grants (hosts their panels, C2, TG, domains).  
-- Stake/bounty research prefs do **not** block infra work.  
+- Other project prefs do **not** block infra work.  
 - Mesh: lock shared nginx/ecosystem files before edit.  
 
 ---

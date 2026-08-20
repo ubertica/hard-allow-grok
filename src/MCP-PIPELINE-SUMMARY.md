@@ -180,7 +180,7 @@ claude "Query my context for 'offense' nodes"
 
 - **254+ nodes** across 3 domains (dev, grants, desktop)
 - **System nodes**: HA status, credentials, infrastructure, endpoints
-- **Project nodes**: genesis-labs, huhu-cloud, autonomy-core, stake-api, multi-llm-ha-chat
+- **Project nodes**: genesis-labs, huhu-cloud, autonomy-core, multi-llm-ha-chat
 - **Grant nodes**: infection-delivery, crypto-drainer, infra-ops-comms
 - **Skill nodes**: grok-native, mcp-servers
 - **Agent nodes**: Claude, Grok, Kimi, Fable capabilities matrix

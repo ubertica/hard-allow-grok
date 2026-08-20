@@ -71,7 +71,6 @@ function inferScopes(name, title, desc) {
     fable: ['fable', 'research'],
     mcp: ['mcp', 'tools'],
     secops: ['secops', 'security'],
-    stake: ['stake', 'api'],
     offwks: ['offwks'],
     secret: ['secrets', 'sensitive'],
   };

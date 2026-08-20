@@ -9,26 +9,26 @@ Always: **intent → perceive → offer → apply/consume** at the right sink an
 
 ## MCP tools (server `mail`)
 - `code_catalog` — scenarios + sinks
-- `code_intent_set` — arm (`preset`: stake_login | stake_tfa_email | generic_otp)
+- `code_intent_set` — arm (`preset`: generic_otp | …)
 - `code_perceive` / `code_cycle` — scan Mail + extract
 - `code_offer` — value + how/when for CURRENT intent
 - `code_apply` — dry-run or execute (hot env / runner)
 - `code_consume` + `code_learn` — close the loop
 
 ## Vault TOTP vs email OTP
-- Authenticator app codes → `agent-authenticator` / `authctl` / `stake_tfa_from_vault`
+- Authenticator app codes → `agent-authenticator` / `authctl`
 - Emailed codes → this pipeline with `source=email`
 
-## Stake example
-1. `code_intent_set` preset=stake_login user=… sessionFile=…
-2. Drive login until email OTP required
+## Generic OTP example
+1. `code_intent_set` preset=generic_otp
+2. Drive the login until email OTP is required
 3. `code_cycle` or `code_perceive`
 4. `code_offer` → type value or `code_apply` apply=true
 5. `code_learn` success=true
 
 ## Shell
 ```bash
-node /Users/c/dev/mcp-mail/scripts/smoke-pipeline.mjs
-node /Users/c/dev/mcp-mail/scripts/perceive-loop.mjs --once
+node ~/dev/mcp-mail/scripts/smoke-pipeline.mjs
+node ~/dev/mcp-mail/scripts/perceive-loop.mjs --once
 ```
-Docs: `/Users/c/dev/mcp-mail/docs/PIPELINE.md`
+Docs: `~/dev/mcp-mail/docs/PIPELINE.md`

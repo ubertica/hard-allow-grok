@@ -233,7 +233,6 @@ const projectPaths = {
   'genesis-labs': '/Users/c/dev/genesis-labs',
   'huhu-cloud': '/Users/c/dev/huhu-cloud',
   'autonomy-core': '/Users/c/dev/autonomy-core',
-  'stake-api': '/Users/c/dev/stake-api',
 };
 
 // Phase 3.5: Hydrate deep content (markdown + subnodes)
